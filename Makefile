@@ -5,7 +5,7 @@ PROJECT			:= msdnetwork-notebook
 IMG_WEB_SVC    		:= ${USER}/${PROJECT}:${TAG}
 IMG_WEB_SVC_JYP    	:= ${USER}/${PROJECT_JYP}:${TAG}
 ID_USER			:= ${shell id -u}
-ID_GROUP			:= ${shell id -g}
+ID_GROUP		:= ${shell id -g}
 
 .PHONY:
 
