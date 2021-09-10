@@ -6,7 +6,7 @@ To get started, you will need:
   - [Docker](https://docs.docker.com/get-docker/)
 
 ## Running
-First, build the segMSDnet image:
+First, build the segMSDnet image in terminal:
 ```
 cd segMSDnet
 make build_docker
