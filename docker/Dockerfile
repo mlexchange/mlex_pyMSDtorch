@@ -1,8 +1,6 @@
 FROM python:3.9
 
 COPY docker/requirements.txt requirements.txt
-# COPY setup setup
-# COPY core core
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
          build-essential\
@@ -11,14 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          libxrender-dev \
          ffmpeg  \
     python3-pip &&\
-    pip install --upgrade pip 
-# RUN python setup/setup.py install 
+    pip install --upgrade pip  
 
-COPY pymsdtorch pymsdtorch
 RUN pip install -r requirements.txt
-RUN pip install -e pymsdtorch/
+RUN pip install git+https://bitbucket.org/berkeleylab/pymsdtorch.git
 
 WORKDIR /app/work/
-# COPY scr scr
 
 CMD ["bash"]
