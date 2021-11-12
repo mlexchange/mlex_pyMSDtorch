@@ -1,4 +1,4 @@
-# segMSDnet
+# pyMSDtorch
 An image segmentation algorithm that implements Mixed-scale Dense Networks (MSDNets) using [pyMSDtorch](https://pymsdtorch.readthedocs.io/en/latest/).
 
 ## Getting started
@@ -8,7 +8,7 @@ To get started, you will need:
 ## Running
 First, build the segMSDnet image in terminal:
 ```
-cd segMSDnet
+cd mlex_pyMSDtorch
 make build_docker
 ```
 Once built, you can run the following examples:
