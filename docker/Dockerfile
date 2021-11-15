@@ -15,5 +15,6 @@ RUN pip install -r requirements.txt
 RUN pip install git+https://bitbucket.org/berkeleylab/pymsdtorch.git
 
 WORKDIR /app/work/
+COPY src src
 
 CMD ["bash"]

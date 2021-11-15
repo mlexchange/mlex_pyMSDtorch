@@ -1,4 +1,4 @@
-# segMSDnet
+# pyMSDtorch
 An image segmentation algorithm that implements Mixed-scale Dense Networks (MSDNets) using [pyMSDtorch](https://pymsdtorch.readthedocs.io/en/latest/).
 
 ## Getting started
@@ -8,7 +8,7 @@ To get started, you will need:
 ## Running
 First, build the segMSDnet image in terminal:
 ```
-cd segMSDnet
+cd mlex_pyMSDtorch
 make build_docker
 ```
 Once built, you can run the following examples:
@@ -18,7 +18,7 @@ make train_example
 ```
 make test_example
 ```
-These examples utilize the information stored in the folder /data. The trained model and the segmented images will be stored in /data/model and /data/out, respectively.
+These examples utilize the information stored in the folder /data. The trained model and the segmented images will be stored in /data/model and /data/output, respectively.
 
 Alternatively, you can run the container interactively as follows:
 ```
@@ -30,7 +30,7 @@ While running interactively, you can perform training and testin processes using
 ### Training
 To train an MSDnet within the docker container, you can run the command:
 ```
-python3 scr/train.py path/to/input_mask_image_dir path/to/input_train_image_dir path/to/output_trained_model_dir "parameters"
+python3 src/train.py path/to/input_mask_image_dir path/to/input_train_image_dir path/to/output_trained_model_dir "parameters"
 ```
 
 where:
@@ -46,7 +46,7 @@ Further information on the training parameters can be found in scr/seg_helpers/m
 ### Testing
 To test an MSDnet model within the docker container, you can run the command:
 ```
-python3 scr/test.py path/to/input_test_image_file path/to/input_trained_model_file path/to/output_segmented_images_dir "parameters"
+python3 src/test.py path/to/input_test_image_file path/to/input_trained_model_file path/to/output_segmented_images_dir "parameters"
 ```
 
 where:
