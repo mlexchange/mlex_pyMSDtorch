@@ -38,7 +38,7 @@ def read_data(path_imgs, path_masks):
     return images, masks
 
 
-def load_data(imgs, masks, shuffle=True, batch_size=32, num_workers=0, pin_memory=False):
+def load_data(imgs, masks, shuffle=False, batch_size=32, num_workers=0, pin_memory=False):
     imgs = torch.Tensor(imgs)
     masks = torch.Tensor(masks)
     trainloader = TensorDataset(imgs, masks)
