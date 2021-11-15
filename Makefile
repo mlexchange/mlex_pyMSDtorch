@@ -20,7 +20,7 @@ build_docker:
 	docker build -t ${IMG_WEB_SVC} -f ./docker/Dockerfile .
 
 run_docker:
-	docker run --gpus all -u ${ID_USER $USER}:${ID_GROUP $USER} --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --memory-swap -1 -it -v ${PWD}:/app/work/local -p 8888:8888 ${IMG_WEB_SVC}
+	docker run -u ${ID_USER $USER}:${ID_GROUP $USER} --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --memory-swap -1 -it -v ${PWD}:/app/work/local -p 8888:8888 ${IMG_WEB_SVC}
 
 train_example:
 	docker run -u ${ID_USER $USER}:${ID_GROUP $USER} --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --memory-swap -1 -it -v ${PWD}:/app/work/ ${IMG_WEB_SVC} python3 src/train.py data/mask data/images/train data/output '{"num_epochs": 200, "optimizer": "Adam", "criterion": "CrossEntropyLoss", "learning_rate": 0.01, "num_layers": 10, "max_dilation": 10}'
