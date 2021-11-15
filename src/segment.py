@@ -23,7 +23,7 @@ class PredictDataset(Dataset):
         return self.im_stack[idx].unsqueeze(0)
 
 
-def load_data(img_path, shuffle=True, batch_size=2, num_workers=0, pin_memory=False):
+def load_data(img_path, shuffle=False, batch_size=2, num_workers=0, pin_memory=False):
     # create custom dataset that doesn't require masks
     predict_data = PredictDataset(img_path)
 
