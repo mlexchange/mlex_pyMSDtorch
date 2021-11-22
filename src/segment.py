@@ -78,7 +78,7 @@ if __name__ == '__main__':
         if counter % parameters.show_progress == 0:
             progress = show_me.cpu().detach().numpy()
             imageio.mimsave(str(segpath) + '/{}-classified.tif'.format(counter), progress)
-            print('classified: '+ str(counter), flush=True)
+            print('classified\t'+ str(counter), flush=True)
         if counter == 0:
             segmented_imgs = show_me
         else:
