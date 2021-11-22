@@ -65,9 +65,6 @@ if __name__ == '__main__':
     # prepare output directory
     segpath = args.output_dir
     helpers.make_dir(segpath)
-    # Initialize logs
-    header = list(TestingResults.__fields__)
-    print(",".join(header), flush=True)
 
     device = helpers.get_device()
     counter = 0
@@ -90,5 +87,3 @@ if __name__ == '__main__':
     segmented_imgs = segmented_imgs.cpu().detach().numpy()
     np.save(str(segpath) + '/results.npy', segmented_imgs)
     imageio.mimwrite(str(segpath) + '/results.tif', segmented_imgs)
-    print(segmented_imgs.shape)
-    print('MSD Segmentation finished', flush=True)
