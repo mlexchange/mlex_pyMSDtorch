@@ -37,7 +37,7 @@ def train_segmentation(net,
 
     # Print logs
     header = list(Metadata.__fields__)
-    print(",".join(header), flush=True)
+    print("\t".join(header), flush=True)
 
     for epoch in range(num_epochs):
         running_train_loss = 0.0
@@ -72,6 +72,6 @@ def train_segmentation(net,
         loss = running_train_loss / len(trainloader)
         train_loss.append(loss)
 
-        print(str(epoch) + ',' + str(loss), flush=True)
+        print(str(epoch) + '\t' + str(loss), flush=True)
 
     return net, train_loss

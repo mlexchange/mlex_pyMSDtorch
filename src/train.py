@@ -33,7 +33,7 @@ def read_data(path_imgs, path_masks):
     assert (images.shape[0] == masks.shape[0])
     images = np.expand_dims(images, 1)
     masks = np.expand_dims(masks, 1)
-    print('number of training images: {}'.format(len(images)))
+    print('number of training images:\t{}'.format(len(images)))
 
     return images, masks
 
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     # Define the number of classes
     num_classes = len(np.unique(train_masks)) - 1
-    print('number of classes: ', num_classes, flush=True)
+    print('number of classes:\t', num_classes, flush=True)
 
     # Define network parameters and define network
     net = build_network(num_classes, num_layers=parameters.num_layers, max_dilation=parameters.max_dilation)
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     epochs = parameters.num_epochs
 
     device = helpers.get_device()
-    print('Device we will compute on: ', device, flush=True)
+    print('Device we will compute on:\t', device, flush=True)
 
     # Dataloader
     if parameters.load is not None:
@@ -133,7 +133,7 @@ if __name__ == '__main__':
                                                   device)
 
     param_count = helpers.count_parameters(net)
-    print('number of network parameters: {}'.format(param_count), flush=True)
+    print('number of network parameters:\t{}'.format(param_count), flush=True)
 
     ## Save model
     model_output_name = args.model_dir + '/state_dict_net.pt'
