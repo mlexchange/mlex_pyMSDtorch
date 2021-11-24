@@ -114,14 +114,14 @@ if __name__ == '__main__':
     # Dataloader
     if parameters.load is not None:
         trainloader = load_data(train_imgs,
-                                 train_masks-1,
+                                 train_masks,
                                  parameters.load.shuffle,
                                  parameters.load.batch_size,
                                  parameters.load.num_workers,
                                  parameters.load.pin_memory)
     else:
         trainloader = load_data(train_imgs,
-                                 train_masks-1)
+                                 train_masks)
 
     # Begin Training
     net.to(device)  # send network to device
