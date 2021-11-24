@@ -76,9 +76,10 @@ if __name__ == '__main__':
         noisy = noisy.to(device)
         output = net(noisy)     # segments
         show_me = torch.argmax(output.cpu().data, dim=1)
+        tmp = torch.clone(show_me)
         if labels is not None:
             for count, label in enumerate(labels):
-                show_me[show_me==count] = label
+                show_me[tmp==count] = label
         # save current image
         if counter % parameters.show_progress == 0:
             progress = show_me.cpu().detach().numpy()

@@ -94,9 +94,10 @@ if __name__ == '__main__':
     num_classes = len(labels) - 1
     labels = labels[1:]      # remove non-labeled pixels
     ordered_labels = np.array(range(num_classes))
+    tmp = np.copy(train_masks)
     if not (labels == ordered_labels).all():
         for count, label in enumerate(labels):
-            train_masks[train_masks==label] = count
+            train_masks[tmp==label] = count
     else:
         labels = None
     print('number of classes:\t', num_classes, flush=True)
