@@ -59,7 +59,9 @@ if __name__ == '__main__':
         testloader = load_data(args.image_stack)
 
     # load network from file
-    net = torch.load(args.model_f)
+    model_dict = torch.load(args.model_f)
+    net = model_dict['model']
+    labels = model_dict['labels']
     net.train()     # Set network to training mode (eval mode kills batchnorm params)
 
     # prepare output directory
@@ -74,6 +76,9 @@ if __name__ == '__main__':
         noisy = noisy.to(device)
         output = net(noisy)     # segments
         show_me = torch.argmax(output.cpu().data, dim=1)
+        if labels is not None:
+            for count, label in enumerate(labels):
+                show_me[show_me==count] = label
         # save current image
         if counter % parameters.show_progress == 0:
             progress = show_me.cpu().detach().numpy()
