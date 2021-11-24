@@ -89,8 +89,16 @@ if __name__ == '__main__':
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
 
-    # Define the number of classes
-    num_classes = len(np.unique(train_masks)) - 1
+    # Arrange label definition (when nonconsecutive)
+    labels = np.unique(train_masks)
+    num_classes = len(labels) - 1
+    labels = labels[1:]      # remove non-labeled pixels
+    tmp = np.copy(train_masks)
+    if not (labels == np.arange(num_classes)).all():
+        for count, label in enumerate(labels):
+            train_masks[tmp==label] = count
+    else:
+        labels = None
     print('number of classes:\t', num_classes, flush=True)
 
     # Define network parameters and define network
@@ -137,5 +145,5 @@ if __name__ == '__main__':
 
     ## Save model
     model_output_name = args.model_dir + '/state_dict_net.pt'
-    torch.save(net, model_output_name)
+    torch.save({'model': net, 'labels': labels}, model_output_name)
     torch.cuda.empty_cache()
