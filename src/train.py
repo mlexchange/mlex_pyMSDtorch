@@ -90,11 +90,12 @@ if __name__ == '__main__':
     parameters = TrainingParameters(**json.loads(args.parameters))
 
     # Arrange label definition (when nonconsecutive)
-    labels = np.unique(train_masks)
+    labels = list(np.unique(train_masks))
     num_classes = len(labels) - 1
     labels = labels[1:]      # remove non-labeled pixels
+    ordered_labels = list(range(num_classes))
     tmp = np.copy(train_masks)
-    if not (labels == np.arange(num_classes)).all():
+    if not labels == ordered_labels:
         for count, label in enumerate(labels):
             train_masks[tmp==label] = count
     else:
