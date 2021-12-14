@@ -52,8 +52,8 @@ def load_data(imgs, masks, shuffle=False, batch_size=32, num_workers=0, pin_memo
     return trainloader
 
 
-def build_network(num_classes, num_layers=10, max_dilation=10):
-    in_channels = 1
+def build_network(num_classes, n_channels, num_layers=10, max_dilation=10):
+    in_channels = n_channels,
     out_channels = num_classes
     num_layers = num_layers
     layer_width = 1
@@ -101,8 +101,12 @@ if __name__ == '__main__':
         labels = None
     print('number of classes:\t', num_classes, flush=True)
 
+    if len(train_imgs.shape)==4:
+        n_channels = train_imgs.shape[3]
+    else:
+        n_channels = 1
     # Define network parameters and define network
-    net = build_network(num_classes, num_layers=parameters.num_layers, max_dilation=parameters.max_dilation)
+    net = build_network(num_classes, n_channels, num_layers=parameters.num_layers, max_dilation=parameters.max_dilation)
 
     # Define training parameters
     label2ignore = -1
