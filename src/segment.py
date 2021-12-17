@@ -14,7 +14,12 @@ class PredictDataset(Dataset):
     def __init__(self, image_path):
         # assume a tiff stack for now
         self.image_path = image_path
-        self.im_stack = torch.from_numpy(imageio.volread(image_path))
+        images = imageio.volread(image_path)
+        if len(images.shape) == 3:
+            images = np.expand_dims(images, 1)
+        else:
+            images = np.transpose(images, (0, 3, 1, 2))  # (# images, # channels, x-size, y-size)
+        self.im_stack = torch.from_numpy(images)
 
     def __len__(self):
         return len(self.im_stack)
@@ -48,7 +53,6 @@ if __name__ == '__main__':
 
     # Load training parameters
     parameters = TestingParameters(**json.loads(args.parameters))
-
     if parameters.load is not None:
         testloader = load_data(args.image_stack,
                                parameters.load.shuffle,
@@ -71,7 +75,7 @@ if __name__ == '__main__':
     device = helpers.get_device()
     counter = 0
     for counter, batch in enumerate(testloader):
-        noisy = batch
+        noisy = np.squeeze(batch, axis=0)
         noisy = noisy.type(torch.FloatTensor)
         noisy = noisy.to(device)
         output = net(noisy)     # segments

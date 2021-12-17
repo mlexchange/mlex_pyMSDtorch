@@ -33,7 +33,6 @@ def read_data(path_imgs, path_masks):
     assert (images.shape[0] == masks.shape[0])
     if len(images.shape) == 3:
         images = np.expand_dims(images, 1)
-        masks = np.expand_dims(masks, 1)
     else:
         images = np.transpose(images, (0,3,1,2))    # (# images, # channels, x-size, y-size)
     print('number of training images:\t{}'.format(len(images)))
