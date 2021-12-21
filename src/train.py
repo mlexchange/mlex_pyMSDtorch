@@ -31,8 +31,10 @@ def read_data(path_imgs, path_masks):
 
     # Check that the number of training images is equal to the number of masks
     assert (images.shape[0] == masks.shape[0])
-    images = np.expand_dims(images, 1)
-    masks = np.expand_dims(masks, 1)
+    if len(images.shape) == 3:
+        images = np.expand_dims(images, 1)
+    else:
+        images = np.transpose(images, (0,3,1,2))    # (# images, # channels, x-size, y-size)
     print('number of training images:\t{}'.format(len(images)))
 
     return images, masks
@@ -52,8 +54,8 @@ def load_data(imgs, masks, shuffle=False, batch_size=32, num_workers=0, pin_memo
     return trainloader
 
 
-def build_network(num_classes, num_layers=10, max_dilation=10):
-    in_channels = 1
+def build_network(num_classes, img_size, num_layers=10, max_dilation=10):
+    in_channels = img_size[0]
     out_channels = num_classes
     num_layers = num_layers
     layer_width = 1
@@ -85,6 +87,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     [train_imgs, train_masks] = read_data(args.feature_dir, args.mask_dir)
+    img_size = train_imgs.shape
 
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
@@ -103,7 +106,10 @@ if __name__ == '__main__':
     print('number of classes:\t', num_classes, flush=True)
 
     # Define network parameters and define network
-    net = build_network(num_classes, num_layers=parameters.num_layers, max_dilation=parameters.max_dilation)
+    net = build_network(num_classes,
+                        img_size[1:],
+                        num_layers=parameters.num_layers,
+                        max_dilation=parameters.max_dilation)
 
     # Define training parameters
     label2ignore = -1
