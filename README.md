@@ -1,5 +1,5 @@
 # pyMSDtorch
-An image segmentation algorithm that implements Mixed-scale Dense Networks (MSDNets) using [pyMSDtorch](https://pymsdtorch.readthedocs.io/en/latest/).
+An image segmentation algorithm that implements Mixed-scale Dense Networks (MSDNets) using [pyMSDtorch](https://pymsdtorch.readthedocs.io/en/latest/). Currently not supporting M1 Mac.
 
 ## Getting started
 To get started, you will need:
