@@ -3,6 +3,7 @@ import json
 
 import numpy as np
 import imageio
+import tifffile
 import torch
 from torch.utils.data import Dataset, DataLoader
 
@@ -87,7 +88,9 @@ if __name__ == '__main__':
         # save current image
         if counter % parameters.show_progress == 0:
             progress = show_me.cpu().detach().numpy()
-            imageio.mimsave(str(segpath) + '/{}-classified.tif'.format(counter), progress)
+            progress = (progress*255).astype(np.uint8)
+            tifffile.imwrite(str(segpath) + '/{}-classified.tif'.format(counter), progress)
+            #imageio.mimsave(str(segpath) + '/{}-classified.tif'.format(counter), progress)
             print('classified\t'+ str(counter), flush=True)
         if counter == 0:
             segmented_imgs = show_me
@@ -96,4 +99,6 @@ if __name__ == '__main__':
     # save results
     segmented_imgs = segmented_imgs.cpu().detach().numpy()
     np.save(str(segpath) + '/results.npy', segmented_imgs)
-    imageio.mimwrite(str(segpath) + '/results.tif', segmented_imgs)
+    segmented_imgs = (segmented_imgs*255).astype(np.uint8)
+    tifffile.imwrite(str(segpath) + '/results.tif', segmented_imgs)
+    #imageio.mimwrite(str(segpath) + '/results.tif', segmented_imgs)
