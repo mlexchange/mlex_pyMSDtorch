@@ -114,8 +114,14 @@ if __name__ == '__main__':
     # Define training parameters
     label2ignore = -1
     criterion = getattr(nn, parameters.criterion.value)
-    criterion = criterion(ignore_index=label2ignore,
-                          size_average=None)
+    # criterion = criterion(ignore_index=label2ignore,
+    #                       size_average=None)
+    # Testing customized weights for 4 class - SRoth GISAXS Image center line feature
+    new_weights = torch.Tensor([10, 5, 1, 1])
+    criterion = criterion(
+        weight = new_weights,
+        ignore_index=label2ignore,
+        size_average=None)
 
     learning_rate = parameters.learning_rate
     optimizer = getattr(optim, parameters.optimizer.value)
