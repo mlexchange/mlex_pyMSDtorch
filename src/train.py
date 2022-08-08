@@ -65,6 +65,7 @@ def build_network(num_classes, img_size, num_layers=10, max_dilation=10):
     final_layer = nn.Softmax(dim=1)
     convolution = nn.Conv2d
 
+    # Add argument for custom_MSD
     network = MSDNet.MixedScaleDenseNetwork(in_channels=in_channels,
                                             out_channels=out_channels,
                                             num_layers=num_layers,
@@ -103,7 +104,8 @@ if __name__ == '__main__':
             train_masks[tmp==label] = count
     else:
         labels = None
-    print('number of classes:\t', num_classes, flush=True)
+    print('number of classes:\t', num_classes, flush=True)\
+    # Add for print network summary
 
     # Define network parameters and define network
     net = build_network(num_classes,
