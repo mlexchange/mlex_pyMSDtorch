@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pip install --upgrade pip  
 
 RUN pip install -r requirements.txt
-RUN pip install git+https://bitbucket.org/berkeleylab/pymsdtorch.git
+RUN pip install git+https://github.com/phzwart/dlsia.git
 
 WORKDIR /app/work/
 COPY src src
