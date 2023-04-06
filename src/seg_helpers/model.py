@@ -7,6 +7,7 @@ class NNModel(str, Enum):
     tunet = 'TUNet'
     tunet3plus = 'TUNet3+'
 
+
 class Optimizer(str, Enum):
     adadelta = "Adadelta"
     adagrad = "Adagrad"
@@ -19,6 +20,7 @@ class Optimizer(str, Enum):
     rmsprop = "RMSprop"
     rprop = "Rprop"
     sgd = "SGD"
+
 
 class Criterion(str, Enum):
     l1loss = "L1Loss" 
@@ -48,6 +50,7 @@ class LoadParameters(BaseModel):
     batch_size: Optional[int] = Field(description="batch size")
     num_workers: Optional[int] = Field(description="number of workers")
     pin_memory: Optional[bool] = Field(description="memory pinning")
+
 
 class MSDNetParameters(BaseModel):
     custom_dilation: bool = Field(description="whether to customize dilation")
