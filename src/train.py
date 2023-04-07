@@ -16,10 +16,6 @@ from dlsia.core import helpers, train_scripts
 from dlsia.core.networks import msdnet, tunet, tunet3plus
 from dlsia.viz_tools import plots
 
-# Old ones
-# from pyMSDtorch.core import helpers
-# from pyMSDtorch.core.networks import MSDNet
-
 from seg_helpers import training
 from seg_helpers.model import NNModel, Optimizer, Criterion, TrainingParameters
 
@@ -86,6 +82,7 @@ def build_msdnet(num_classes, img_size, num_layers = 10,
                                                 convolution=convolution
                                                 )
     else:
+        dilation_array = np.array(dilation_array)
         network = msdnet.MixedScaleDenseNetwork(in_channels=in_channels,
                                                 out_channels=out_channels,
                                                 num_layers=num_layers,
@@ -158,7 +155,8 @@ if __name__ == '__main__':
 
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
-
+    print(f'+++++{parameters}++++++++++')
+    
     # Arrange label definition (when nonconsecutive)
     labels = list(np.unique(train_masks))
     num_classes = len(labels) - 1
@@ -175,7 +173,7 @@ if __name__ == '__main__':
 
     # Define network parameters and define network
     model = parameters.model
-    print(f'+++++{parameters}++++++++++')
+   
     if model == 'MSDNet':
         network = build_msdnet(num_classes, 
                                 img_size[1:],
@@ -187,7 +185,7 @@ if __name__ == '__main__':
     elif model == 'TUNet':
         network = build_tunet(num_classes,
                               img_size,
-                              depth = parameters.tunet_parameters.depth,
+                              depth = parameters.num_layers,
                               base_channels = parameters.tunet_parameters.base_channels,
                               growth_rate = parameters.tunet_parameters.growth_rate,
                               hidden_rate = parameters.tunet_parameters.hidden_rate,
@@ -202,6 +200,7 @@ if __name__ == '__main__':
                               carryover_channels = parameters.tunet_parameters.carryover_channels,
                               )
 
+    print(f'Network Details: {network}')
     # Define training parameters
     label2ignore = -1
     criterion = getattr(nn, parameters.criterion.value)

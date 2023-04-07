@@ -54,12 +54,11 @@ class LoadParameters(BaseModel):
 
 class MSDNetParameters(BaseModel):
     custom_dilation: bool = Field(description="whether to customize dilation")
-    max_dilation: int = Field(description="maximum dilation")
-    dilation_array: List[int] = Field(description="customized dilation array")
+    max_dilation: Optional[int] = Field(description="maximum dilation")
+    dilation_array: Optional[List[int]] = Field(description="customized dilation array")
 
 
 class TUNetParameters(BaseModel):
-    depth: int = Field(description='the number of network layers')
     base_channels: int = Field(description='the number of initial channels')
     growth_rate: int = Field(description='multiplicative growth factor of number of channels per layer of depth')
     hidden_rate: int = Field(description='multiplicative growth factor of channels within each layer')

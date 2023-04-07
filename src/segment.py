@@ -6,7 +6,7 @@ import imageio
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-from pyMSDtorch.core import helpers
+from dlsia.core import helpers
 from seg_helpers.model import TestingParameters, TestingResults
 
 
