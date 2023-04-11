@@ -31,9 +31,11 @@ train_msdnet_customdil:
 train_tunet:
 	docker run -u ${ID_USER $USER}:${ID_GROUP $USER} --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --memory-swap -1 -it -v ${PWD}:/app/work/ ${IMG_WEB_SVC} python3 src/train.py data/mask data/images/train data/output '{"model": "TUNet", "num_epochs": 10, "optimizer": "Adam", "criterion": "CrossEntropyLoss", "learning_rate": 0.01, "num_layers": 6, "tunet_parameters": {"base_channels": 16, "growth_rate": 2, "hidden_rate": 1}}'
 
+train_tunet3plus:
+	docker run -u ${ID_USER $USER}:${ID_GROUP $USER} --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --memory-swap -1 -it -v ${PWD}:/app/work/ ${IMG_WEB_SVC} python3 src/train.py data/mask data/images/train data/output '{"model": "TUNet", "num_epochs": 10, "optimizer": "Adam", "criterion": "CrossEntropyLoss", "learning_rate": 0.01, "num_layers": 6, "tunet_parameters": {"base_channels": 16, "carryover_channels": 5, "growth_rate": 2, "hidden_rate": 1}}'
+
 test_segment:
 	docker run -u ${ID_USER $USER}:${ID_GROUP $USER} --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --memory-swap -1 -it -v ${PWD}:/app/work/ ${IMG_WEB_SVC} python3 src/segment.py data/images/test/segment_series.tif data/output/state_dict_net.pt data/output '{"show_progress": 50}'
-
 
 clean: 
 	find -name "*~" -delete
