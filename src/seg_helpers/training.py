@@ -58,6 +58,7 @@ def train_segmentation(net,
                 target = target.type(torch.LongTensor)
                 target = target.to(device).squeeze(1)
 
+            print(f'!!!noisy is: {noisy}')
             output = net(noisy)
             loss = criterion(output, target)
 

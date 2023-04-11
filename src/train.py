@@ -8,13 +8,11 @@ from skimage import io
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
 from torch.utils.data import TensorDataset, DataLoader
 
 # New from dlsia Package
 from dlsia.core import helpers, train_scripts
 from dlsia.core.networks import msdnet, tunet, tunet3plus
-from dlsia.viz_tools import plots
 
 from seg_helpers import training
 from seg_helpers.model import NNModel, Optimizer, Criterion, TrainingParameters
@@ -117,8 +115,8 @@ def build_tunet(num_classes, img_size,
     return network
 
 def build_tunet3plus(num_classes, img_size,
-                depth = 4, base_channels = 32, growth_rate = 1.5, hidden_rate = 1,
-                carryover_channels = 32):
+                    depth = 4, base_channels = 32, growth_rate = 1.5, hidden_rate = 1,
+                    carryover_channels = 32):
     image_shape = img_size
     in_channels = img_size[0]
     out_channels = num_classes
@@ -139,6 +137,7 @@ def build_tunet3plus(num_classes, img_size,
                                     activation=activation,
                                     normalization=normalization,
                                     )
+    return network
 
 # def build_network():
 
@@ -155,6 +154,7 @@ if __name__ == '__main__':
 
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
+    print(f'Training Image Size: {img_size}')
     print(f'+++++{parameters}++++++++++')
     
     # Arrange label definition (when nonconsecutive)
@@ -236,12 +236,20 @@ if __name__ == '__main__':
 
     # Begin Training
     network.to(device)  # send network to device
-    net, train_loss = training.train_segmentation(network,
-                                                  trainloader,
-                                                  epochs,
-                                                  criterion,
-                                                  optimizer,
-                                                  device)
+    net, results = train_scripts.train_segmentation(network,
+                                                       trainloader,
+                                                       trainloader,
+                                                       epochs,
+                                                       criterion,
+                                                       optimizer,
+                                                       device)
+    
+    # net, train_loss = training.train_segmentation(network,
+    #                                               trainloader,
+    #                                               epochs,
+    #                                               criterion,
+    #                                               optimizer,
+    #                                               device)
 
     param_count = helpers.count_parameters(net)
     print('number of network parameters:\t{}'.format(param_count), flush=True)
