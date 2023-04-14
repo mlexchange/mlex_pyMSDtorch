@@ -57,13 +57,13 @@ def load_data(imgs, masks, shuffle=False, batch_size=32, num_workers=0, pin_memo
 
 def build_msdnet(num_classes, img_size, num_layers = 10, 
                   custom_dilation = False, max_dilation = 10, dilation_array = np.array([1,2,4,8])):
-    in_channels = img_size[0]
+    in_channels = img_size[1]
     out_channels = num_classes
     num_layers = num_layers
     layer_width = 1
     max_dilation = max_dilation
-    activation = nn.ReLU()      # no hardcode
-    normalization = nn.BatchNorm2d  # no hardcode
+    activation = nn.ReLU()      # no hardcode, make it optional too
+    normalization = nn.BatchNorm2d  # no hardcode, same as above
     final_layer = nn.Softmax(dim=1)
     convolution = nn.Conv2d
 
@@ -94,9 +94,10 @@ def build_msdnet(num_classes, img_size, num_layers = 10,
     return network
 
 def build_tunet(num_classes, img_size,
-                depth = 4, base_channels = 32, growth_rate = 1.5, hidden_rate = 1):
-    image_shape = img_size
-    in_channels = img_size[0]
+                depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1):
+    image_shape = img_size[2:]
+    print(f'image size: {img_size}')
+    in_channels = img_size[1]
     out_channels = num_classes
     activation = nn.ReLU()
     normalization = nn.BatchNorm2d
@@ -115,10 +116,10 @@ def build_tunet(num_classes, img_size,
     return network
 
 def build_tunet3plus(num_classes, img_size,
-                    depth = 4, base_channels = 32, growth_rate = 1.5, hidden_rate = 1,
+                    depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1,
                     carryover_channels = 32):
-    image_shape = img_size
-    in_channels = img_size[0]
+    image_shape = img_size[2:]
+    in_channels = img_size[1]
     out_channels = num_classes
     activation = nn.ReLU()
     normalization = nn.BatchNorm2d
@@ -139,7 +140,6 @@ def build_tunet3plus(num_classes, img_size,
                                     )
     return network
 
-# def build_network():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -158,6 +158,7 @@ if __name__ == '__main__':
     print(f'+++++{parameters}++++++++++')
     
     # Arrange label definition (when nonconsecutive)
+    # Adding creteria for fully labeled masks, don't do -1
     labels = list(np.unique(train_masks))
     num_classes = len(labels) - 1
     labels = labels[1:]      # remove non-labeled pixels
@@ -173,10 +174,12 @@ if __name__ == '__main__':
 
     # Define network parameters and define network
     model = parameters.model
+
+    print(f'Here is the image size: {img_size}')
    
     if model == 'MSDNet':
         network = build_msdnet(num_classes, 
-                                img_size[1:],
+                                img_size,
                                 num_layers = parameters.num_layers,
                                 custom_dilation = parameters.msdnet_parameters.custom_dilation,
                                 max_dilation = parameters.msdnet_parameters.max_dilation,
@@ -202,6 +205,7 @@ if __name__ == '__main__':
 
     print(f'Network Details: {network}')
     # Define training parameters
+    # In the fully labeled images, don't need to do this
     label2ignore = -1
     criterion = getattr(nn, parameters.criterion.value)
     criterion = criterion(ignore_index=label2ignore,
@@ -242,7 +246,8 @@ if __name__ == '__main__':
                                                        epochs,
                                                        criterion,
                                                        optimizer,
-                                                       device)
+                                                       device,
+                                                       show=1)
     
     # net, train_loss = training.train_segmentation(network,
     #                                               trainloader,
