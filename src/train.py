@@ -14,8 +14,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from dlsia.core import helpers, train_scripts
 from dlsia.core.networks import msdnet, tunet, tunet3plus
 
-from seg_helpers import training
-from seg_helpers.model import NNModel, Optimizer, Criterion, TrainingParameters
+from model import TrainingParameters
 
 
 def read_data(path_imgs, path_masks):
@@ -56,15 +55,13 @@ def load_data(imgs, masks, shuffle=False, batch_size=32, num_workers=0, pin_memo
 
 
 def build_msdnet(num_classes, img_size, num_layers = 10, 
+                 activation = nn.ReLU(), normalization = nn.BatchNorm2d, final_layer = nn.Softmax(dim=1),
                   custom_dilation = False, max_dilation = 10, dilation_array = np.array([1,2,4,8])):
     in_channels = img_size[1]
     out_channels = num_classes
     num_layers = num_layers
     layer_width = 1
     max_dilation = max_dilation
-    activation = nn.ReLU()      # no hardcode, make it optional too
-    normalization = nn.BatchNorm2d  # no hardcode, same as above
-    final_layer = nn.Softmax(dim=1)
     convolution = nn.Conv2d
 
     if custom_dilation == False:
@@ -94,13 +91,12 @@ def build_msdnet(num_classes, img_size, num_layers = 10,
     return network
 
 def build_tunet(num_classes, img_size,
+                activation = nn.ReLU(), normalization = nn.BatchNorm2d,
                 depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1):
     image_shape = img_size[2:]
     print(f'image size: {img_size}')
     in_channels = img_size[1]
     out_channels = num_classes
-    activation = nn.ReLU()
-    normalization = nn.BatchNorm2d
     # Recommended parameters are depth = 4, 5, or 6; 
     # base_channels = 32 or 64; growth_rate between 1.5 and 2.5; and hidden_rate = 1
     network = tunet.TUNet(image_shape=image_shape,
@@ -116,13 +112,12 @@ def build_tunet(num_classes, img_size,
     return network
 
 def build_tunet3plus(num_classes, img_size,
+                     activation = nn.ReLU(), normalization = nn.BatchNorm2d,
                     depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1,
                     carryover_channels = 32):
     image_shape = img_size[2:]
     in_channels = img_size[1]
     out_channels = num_classes
-    activation = nn.ReLU()
-    normalization = nn.BatchNorm2d
     # Recommended parameters are depth = 4, 5, or 6; 
     # base_channels = 32 or 64; growth_rate between 1.5 and 2.5; and hidden_rate = 1
     # carryover_channels : indicates the number of channels in each skip connection. Default of 0 sets this equal to base_channels
@@ -155,7 +150,6 @@ if __name__ == '__main__':
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
     print(f'Training Image Size: {img_size}')
-    print(f'+++++{parameters}++++++++++')
     
     # Arrange label definition (when nonconsecutive)
     # Adding creteria for fully labeled masks, don't do -1
@@ -174,13 +168,11 @@ if __name__ == '__main__':
 
     # Define network parameters and define network
     model = parameters.model
-
-    print(f'Here is the image size: {img_size}')
    
     if model == 'MSDNet':
         network = build_msdnet(num_classes, 
                                 img_size,
-                                num_layers = parameters.num_layers,
+                                num_layers = parameters.msdnet_parameters.num_layers,
                                 custom_dilation = parameters.msdnet_parameters.custom_dilation,
                                 max_dilation = parameters.msdnet_parameters.max_dilation,
                                 dilation_array = parameters.msdnet_parameters.dilation_array
@@ -188,7 +180,7 @@ if __name__ == '__main__':
     elif model == 'TUNet':
         network = build_tunet(num_classes,
                               img_size,
-                              depth = parameters.num_layers,
+                              depth = parameters.tunet_parameters.depth,
                               base_channels = parameters.tunet_parameters.base_channels,
                               growth_rate = parameters.tunet_parameters.growth_rate,
                               hidden_rate = parameters.tunet_parameters.hidden_rate,

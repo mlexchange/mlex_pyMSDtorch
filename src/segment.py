@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 from dlsia.core import helpers
-from seg_helpers.model import TestingParameters, TestingResults
+from model import TestingParameters, TestingResults
 
 
 class PredictDataset(Dataset):
