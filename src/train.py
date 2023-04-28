@@ -171,28 +171,28 @@ if __name__ == '__main__':
    
     if model == 'MSDNet':
         network = build_msdnet(num_classes, 
-                                img_size,
-                                num_layers = parameters.msdnet_parameters.num_layers,
-                                custom_dilation = parameters.msdnet_parameters.custom_dilation,
-                                max_dilation = parameters.msdnet_parameters.max_dilation,
-                                dilation_array = parameters.msdnet_parameters.dilation_array
-                                )
+                               img_size,
+                               num_layers = parameters.num_layers,
+                               custom_dilation = parameters.custom_dilation,
+                               max_dilation = parameters.max_dilation,
+                               dilation_array = parameters.dilation_array,
+                               )
     elif model == 'TUNet':
         network = build_tunet(num_classes,
                               img_size,
-                              depth = parameters.tunet_parameters.depth,
-                              base_channels = parameters.tunet_parameters.base_channels,
-                              growth_rate = parameters.tunet_parameters.growth_rate,
-                              hidden_rate = parameters.tunet_parameters.hidden_rate,
+                              depth = parameters.depth,
+                              base_channels = parameters.base_channels,
+                              growth_rate = parameters.growth_rate,
+                              hidden_rate = parameters.hidden_rate,
                               )
     elif model == 'TUNet3+':
         network = build_tunet3plus(num_classes,
                               img_size,
                               depth = parameters.tunet_parameters.depth,
-                              base_channels = parameters.tunet_parameters.base_channels,
-                              growth_rate = parameters.tunet_parameters.growth_rate,
-                              hidden_rate = parameters.tunet_parameters.hidden_rate,
-                              carryover_channels = parameters.tunet_parameters.carryover_channels,
+                              base_channels = parameters.base_channels,
+                              growth_rate = parameters.growth_rate,
+                              hidden_rate = parameters.hidden_rate,
+                              carryover_channels = parameters.carryover_channels,
                               )
 
     print(f'Network Details: {network}')
@@ -233,13 +233,13 @@ if __name__ == '__main__':
     # Begin Training
     network.to(device)  # send network to device
     net, results = train_scripts.train_segmentation(network,
-                                                       trainloader,
-                                                       trainloader,
-                                                       epochs,
-                                                       criterion,
-                                                       optimizer,
-                                                       device,
-                                                       show=1)
+                                                    trainloader,
+                                                    trainloader,
+                                                    epochs,
+                                                    criterion,
+                                                    optimizer,
+                                                    device,
+                                                    show=1)
     
     # net, train_loss = training.train_segmentation(network,
     #                                               trainloader,

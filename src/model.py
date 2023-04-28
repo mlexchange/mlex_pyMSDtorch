@@ -52,29 +52,21 @@ class LoadParameters(BaseModel):
     pin_memory: Optional[bool] = Field(description="memory pinning")
 
 
-class MSDNetParameters(BaseModel):
-    num_layers: int = Field(description="number of layers")
-    custom_dilation: bool = Field(description="whether to customize dilation")
-    max_dilation: Optional[int] = Field(description="maximum dilation")
-    dilation_array: Optional[List[int]] = Field(description="customized dilation array")
-
-
-class TUNetParameters(BaseModel):
-    depth: int = Field(description='the depth of the UNet')
-    base_channels: int = Field(description='the number of initial channels')
-    growth_rate: int = Field(description='multiplicative growth factor of number of channels per layer of depth')
-    hidden_rate: int = Field(description='multiplicative growth factor of channels within each layer')
-    carryover_channels: Optional[int] = Field(description='the number of channels in each skip connection')
-
-
 class TrainingParameters(BaseModel):
     model: NNModel
     num_epochs: int = Field(description="number of epochs")
     optimizer: Optimizer
     criterion: Criterion
     learning_rate: float = Field(description='learning rate')
-    msdnet_parameters: Optional[MSDNetParameters]
-    tunet_parameters: Optional[TUNetParameters]
+    num_layers: Optional[int] = Field(description="number of layers for MSDNet")
+    custom_dilation: Optional[bool] = Field(description="whether to customize dilation for MSDNet")
+    max_dilation: Optional[int] = Field(description="maximum dilation for MSDNet")
+    dilation_array: Optional[List[int]] = Field(description="customized dilation array for MSDNet")
+    depth: Optional[int] = Field(description='the depth of the UNet')
+    base_channels: Optional[int] = Field(description='the number of initial channels for UNet')
+    growth_rate: Optional[int] = Field(description='multiplicative growth factor of number of channels per layer of depth for UNet')
+    hidden_rate: Optional[int] = Field(description='multiplicative growth factor of channels within each layer for UNet')
+    carryover_channels: Optional[int] = Field(description='the number of channels in each skip connection for UNet3+')
     load: Optional[LoadParameters]
 
 
