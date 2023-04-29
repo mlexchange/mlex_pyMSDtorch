@@ -65,6 +65,7 @@ def build_msdnet(num_classes, img_size, num_layers = 10,
     convolution = nn.Conv2d
 
     if custom_dilation == False:
+        print(f'Use of Max Dilation: {max_dilation}')
     # Add argument for custom_MSD
         network = msdnet.MixedScaleDenseNetwork(in_channels=in_channels,
                                                 out_channels=out_channels,
@@ -78,6 +79,7 @@ def build_msdnet(num_classes, img_size, num_layers = 10,
                                                 )
     else:
         dilation_array = np.array(dilation_array)
+        print(f'Use of Custom Dilation: {dilation_array}')
         network = msdnet.MixedScaleDenseNetwork(in_channels=in_channels,
                                                 out_channels=out_channels,
                                                 num_layers=num_layers,
@@ -94,7 +96,6 @@ def build_tunet(num_classes, img_size,
                 activation = nn.ReLU(), normalization = nn.BatchNorm2d,
                 depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1):
     image_shape = img_size[2:]
-    print(f'image size: {img_size}')
     in_channels = img_size[1]
     out_channels = num_classes
     # Recommended parameters are depth = 4, 5, or 6; 
@@ -149,7 +150,6 @@ if __name__ == '__main__':
 
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
-    print(f'Training Image Size: {img_size}')
     
     # Arrange label definition (when nonconsecutive)
     # Adding creteria for fully labeled masks, don't do -1
@@ -164,10 +164,10 @@ if __name__ == '__main__':
     else:
         labels = None
     print('number of classes:\t', num_classes, flush=True)\
-    # Add for print network summary
 
     # Define network parameters and define network
     model = parameters.model
+    print(f'Model: {model}')
    
     if model == 'MSDNet':
         network = build_msdnet(num_classes, 
@@ -188,14 +188,13 @@ if __name__ == '__main__':
     elif model == 'TUNet3+':
         network = build_tunet3plus(num_classes,
                               img_size,
-                              depth = parameters.tunet_parameters.depth,
+                              depth = parameters.depth,
                               base_channels = parameters.base_channels,
                               growth_rate = parameters.growth_rate,
                               hidden_rate = parameters.hidden_rate,
                               carryover_channels = parameters.carryover_channels,
                               )
 
-    print(f'Network Details: {network}')
     # Define training parameters
     # In the fully labeled images, don't need to do this
     label2ignore = -1
