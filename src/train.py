@@ -233,7 +233,7 @@ if __name__ == '__main__':
     network.to(device)  # send network to device
     net, results = train_scripts.train_segmentation(network,
                                                     trainloader,
-                                                    trainloader,
+                                                    False,
                                                     epochs,
                                                     criterion,
                                                     optimizer,
