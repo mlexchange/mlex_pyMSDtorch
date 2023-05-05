@@ -1,20 +1,20 @@
 import argparse
 import json
 import pathlib
-import sys
 
 import numpy as np
 from skimage import io
+
 import torch
-import torch.optim as optim
 import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from pyMSDtorch.core import helpers
-from pyMSDtorch.core.networks import MSDNet
+# New from dlsia Package
+from dlsia.core import helpers, train_scripts
+from dlsia.core.networks import msdnet, tunet, tunet3plus
 
-from seg_helpers import training
-from seg_helpers.model import TrainingParameters
+from model import TrainingParameters
 
 
 def read_data(path_imgs, path_masks):
@@ -54,27 +54,86 @@ def load_data(imgs, masks, shuffle=False, batch_size=32, num_workers=0, pin_memo
     return trainloader
 
 
-def build_network(num_classes, img_size, num_layers=10, max_dilation=10):
-    in_channels = img_size[0]
+def build_msdnet(num_classes, img_size, num_layers = 10, 
+                 activation = nn.ReLU(), normalization = nn.BatchNorm2d, final_layer = nn.Softmax(dim=1),
+                  custom_dilation = False, max_dilation = 10, dilation_array = np.array([1,2,4,8])):
+    in_channels = img_size[1]
     out_channels = num_classes
     num_layers = num_layers
     layer_width = 1
     max_dilation = max_dilation
-    activation = nn.ReLU()      # no hardcode
-    normalization = nn.BatchNorm2d  # no hardcode
-    final_layer = nn.Softmax(dim=1)
     convolution = nn.Conv2d
 
-    network = MSDNet.MixedScaleDenseNetwork(in_channels=in_channels,
-                                            out_channels=out_channels,
-                                            num_layers=num_layers,
-                                            layer_width=layer_width,
-                                            max_dilation=max_dilation,
-                                            activation=activation,
-                                            normalization=normalization,
-                                            final_layer=final_layer,
-                                            convolution=convolution
-                                            )
+    if custom_dilation == False:
+        print(f'Use of Max Dilation: {max_dilation}')
+    # Add argument for custom_MSD
+        network = msdnet.MixedScaleDenseNetwork(in_channels=in_channels,
+                                                out_channels=out_channels,
+                                                num_layers=num_layers,
+                                                layer_width=layer_width,
+                                                max_dilation=max_dilation,
+                                                activation=activation,
+                                                normalization=normalization,
+                                                final_layer=final_layer,
+                                                convolution=convolution
+                                                )
+    else:
+        dilation_array = np.array(dilation_array)
+        print(f'Use of Custom Dilation: {dilation_array}')
+        network = msdnet.MixedScaleDenseNetwork(in_channels=in_channels,
+                                                out_channels=out_channels,
+                                                num_layers=num_layers,
+                                                layer_width=layer_width,
+                                                custom_msdnet=dilation_array,
+                                                activation=activation,
+                                                normalization=normalization,
+                                                final_layer=final_layer,
+                                                convolution=convolution
+                                                )
+    return network
+
+def build_tunet(num_classes, img_size,
+                activation = nn.ReLU(), normalization = nn.BatchNorm2d,
+                depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1):
+    image_shape = img_size[2:]
+    in_channels = img_size[1]
+    out_channels = num_classes
+    # Recommended parameters are depth = 4, 5, or 6; 
+    # base_channels = 32 or 64; growth_rate between 1.5 and 2.5; and hidden_rate = 1
+    network = tunet.TUNet(image_shape=image_shape,
+                          in_channels=in_channels,
+                          out_channels=out_channels,
+                          depth=depth,
+                          base_channels=base_channels,
+                          growth_rate=growth_rate,
+                          hidden_rate=hidden_rate,
+                          activation=activation,
+                          normalization=normalization,
+                         )
+    return network
+
+def build_tunet3plus(num_classes, img_size,
+                     activation = nn.ReLU(), normalization = nn.BatchNorm2d,
+                    depth = 4, base_channels = 32, growth_rate = 2, hidden_rate = 1,
+                    carryover_channels = 32):
+    image_shape = img_size[2:]
+    in_channels = img_size[1]
+    out_channels = num_classes
+    # Recommended parameters are depth = 4, 5, or 6; 
+    # base_channels = 32 or 64; growth_rate between 1.5 and 2.5; and hidden_rate = 1
+    # carryover_channels : indicates the number of channels in each skip connection. Default of 0 sets this equal to base_channels
+    
+    network = tunet3plus.TUNet3Plus(image_shape=image_shape,
+                                    in_channels=in_channels,
+                                    out_channels=out_channels,
+                                    depth=depth,
+                                    base_channels=base_channels,
+                                    carryover_channels=carryover_channels,
+                                    growth_rate=growth_rate,
+                                    hidden_rate=hidden_rate,
+                                    activation=activation,
+                                    normalization=normalization,
+                                    )
     return network
 
 
@@ -91,8 +150,9 @@ if __name__ == '__main__':
 
     # Load training parameters
     parameters = TrainingParameters(**json.loads(args.parameters))
-
+    
     # Arrange label definition (when nonconsecutive)
+    # Adding creteria for fully labeled masks, don't do -1
     labels = list(np.unique(train_masks))
     num_classes = len(labels) - 1
     labels = labels[1:]      # remove non-labeled pixels
@@ -103,23 +163,54 @@ if __name__ == '__main__':
             train_masks[tmp==label] = count
     else:
         labels = None
-    print('number of classes:\t', num_classes, flush=True)
+    print('number of classes:\t', num_classes, flush=True)\
 
     # Define network parameters and define network
-    net = build_network(num_classes,
-                        img_size[1:],
-                        num_layers=parameters.num_layers,
-                        max_dilation=parameters.max_dilation)
+    model = parameters.model
+    print(f'Model: {model}')
+   
+    if model == 'MSDNet':
+        network = build_msdnet(num_classes, 
+                               img_size,
+                               num_layers = parameters.num_layers,
+                               custom_dilation = parameters.custom_dilation,
+                               max_dilation = parameters.max_dilation,
+                               dilation_array = parameters.dilation_array,
+                               )
+    elif model == 'TUNet':
+        network = build_tunet(num_classes,
+                              img_size,
+                              depth = parameters.depth,
+                              base_channels = parameters.base_channels,
+                              growth_rate = parameters.growth_rate,
+                              hidden_rate = parameters.hidden_rate,
+                              )
+    elif model == 'TUNet3+':
+        network = build_tunet3plus(num_classes,
+                              img_size,
+                              depth = parameters.depth,
+                              base_channels = parameters.base_channels,
+                              growth_rate = parameters.growth_rate,
+                              hidden_rate = parameters.hidden_rate,
+                              carryover_channels = parameters.carryover_channels,
+                              )
 
     # Define training parameters
+    # In the fully labeled images, don't need to do this
     label2ignore = -1
     criterion = getattr(nn, parameters.criterion.value)
     criterion = criterion(ignore_index=label2ignore,
                           size_average=None)
+    # Testing customized weights for 4 class - SRoth GISAXS Image center line feature
+    # new_weights = torch.Tensor([10, 5, 1, 1])
+    # criterion = criterion(
+    #     weight = new_weights,
+    #     ignore_index=label2ignore,
+    #     size_average=None)
 
     learning_rate = parameters.learning_rate
     optimizer = getattr(optim, parameters.optimizer.value)
-    optimizer = optimizer(net.parameters(), lr=learning_rate)
+    optimizer = optimizer(network.parameters(), lr = learning_rate)
 
     epochs = parameters.num_epochs
 
@@ -139,13 +230,22 @@ if __name__ == '__main__':
                                  train_masks)
 
     # Begin Training
-    net.to(device)  # send network to device
-    net, train_loss = training.train_segmentation(net,
-                                                  trainloader,
-                                                  epochs,
-                                                  criterion,
-                                                  optimizer,
-                                                  device)
+    network.to(device)  # send network to device
+    net, results = train_scripts.train_segmentation(network,
+                                                    trainloader,
+                                                    False,
+                                                    epochs,
+                                                    criterion,
+                                                    optimizer,
+                                                    device,
+                                                    show=1)
+    
+    # net, train_loss = training.train_segmentation(network,
+    #                                               trainloader,
+    #                                               epochs,
+    #                                               criterion,
+    #                                               optimizer,
+    #                                               device)
 
     param_count = helpers.count_parameters(net)
     print('number of network parameters:\t{}'.format(param_count), flush=True)

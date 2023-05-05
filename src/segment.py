@@ -7,8 +7,8 @@ import tifffile
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-from pyMSDtorch.core import helpers
-from seg_helpers.model import TestingParameters, TestingResults
+from dlsia.core import helpers
+from model import TestingParameters, TestingResults
 
 
 class PredictDataset(Dataset):
